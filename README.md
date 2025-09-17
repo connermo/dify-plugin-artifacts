@@ -26,6 +26,10 @@ This is a web-based chat interaction interface that can help you automatically r
 
 ### Changelog
 
+#### v0.0.4
+- Enhanced UI animations and transitions
+- Improved coding mode layout
+- Added smooth artifact display animations
 
 #### v0.0.3
 - Fixed issue with localhost not working in local Docker deployment

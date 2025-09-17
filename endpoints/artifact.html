@@ -29,6 +29,12 @@
             gap: 24px;
             padding: 32px 0;
             box-sizing: border-box;
+            transition: justify-content 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .main-container.coding-mode {
+            justify-content: flex-start;
+            padding-left: 32px;
+            padding-right: 32px;
         }
         .chat-box,
         .artifact-pane {
@@ -48,6 +54,13 @@
             min-height: 550px;
             max-height: 88vh;
             flex: 1 1 340px;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .main-container.coding-mode .chat-box {
+            width: 320px;
+            min-width: 320px;
+            max-width: 320px;
+            flex: 0 0 320px;
         }
         .chat-header {
             font-size: 1.1rem;
@@ -236,9 +249,31 @@
             display: none;
             flex-direction: column;
             flex: 1 1 400px;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .artifact-pane.active {
             display: flex;
+            opacity: 1;
+            transform: translateX(0);
+            animation: slideInFromRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        @keyframes slideInFromRight {
+            0% {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .main-container.coding-mode .artifact-pane.active {
+            flex: 1 1 auto;
+            width: auto;
+            max-width: none;
         }
         .artifact-tabs {
             display: flex;
@@ -391,6 +426,12 @@
                 padding: 20px 0;
                 height: auto;
             }
+            .main-container.coding-mode {
+                justify-content: center;
+                align-items: center;
+                padding-left: 0;
+                padding-right: 0;
+            }
             .chat-box,
             .artifact-pane {
                 width: 92%;
@@ -398,6 +439,17 @@
                 max-width: 580px;
                 max-height: none;
                 height: auto;
+            }
+            .main-container.coding-mode .chat-box {
+                width: 92%;
+                min-width: 300px;
+                max-width: 580px;
+                flex: none;
+            }
+            .main-container.coding-mode .artifact-pane.active {
+                width: 92%;
+                max-width: 580px;
+                flex: none;
             }
             .chat-box {
                 min-height: 450px;
@@ -488,11 +540,20 @@
         const tabCode = document.getElementById('tab-code');
         const tabPreview = document.getElementById('tab-preview');
         const newChatBtn = document.getElementById('new-chat-btn');
+        const mainContainer = document.querySelector('.main-container');
         let conversationId = localStorage.getItem('conversation_id') || '';
         let lastArtifactHtml = '';
         let artifactGenerating = false;
         let artifactCodeBuffer = '';
         let artifactMessagePlaceholder = null;
+        
+        function enterCodingMode() {
+            mainContainer.classList.add('coding-mode');
+        }
+        
+        function exitCodingMode() {
+            mainContainer.classList.remove('coding-mode');
+        }
         
     
         function updateCodePlaceholder(botMessageContainer, contentBeforeCodeblock, isLoading = true) {
@@ -635,6 +696,7 @@
             lastArtifactHtml = htmlCode;
         }
         function hideArtifact() {
+            exitCodingMode();
             artifactPane.classList.remove('active');
             artifactCode.textContent = '';
             artifactPreview.innerHTML = '';
@@ -694,6 +756,10 @@
                                         const codeStartIndex = accumulatedText.indexOf('```html');
                                         const contentBeforeCodeblock = accumulatedText.substring(0, codeStartIndex);
                                         updateCodePlaceholder(botMessageContainer, contentBeforeCodeblock);
+                                        
+                                        // Enter coding mode with smooth animation
+                                        enterCodingMode();
+                                        
                                         artifactPane.classList.add('active');
                                         tabCode.classList.add('active');
                                         tabPreview.classList.remove('active');
